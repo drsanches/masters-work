@@ -8,7 +8,7 @@ import java.nio.file.Paths;
 import java.util.Comparator;
 import java.util.List;
 
-public class DatasetCreator {
+public class DataLoader {
 
     private static final String DATA_FOLDER = "../data";
     private static Parser parser = new Parser();
