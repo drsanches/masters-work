@@ -58,7 +58,7 @@ class Parser {
     String getTransactionsCSV(String address) {
         int pagesNumber = 10;
         StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("time,direction,address,value,price\n");
+        stringBuilder.append("time,direction,address,contract,value,price\n");
         for (int page = 1; page <= pagesNumber; page++) {
             System.out.println("Page: " + page + "/" + pagesNumber);
             String source = pageLoader.downloadHtml("https://etherscan.io/txs?a=" + address + "&p=" + page);
@@ -74,9 +74,12 @@ class Parser {
                 String time = line.getElementsByTag("td").get(3).getElementsByTag("span").attr("title");
                 String direction = line.getElementsByTag("td").get(5).text();
                 String address2;
+                boolean smartContract;
                 if (direction.equals("IN")) {
+                    smartContract = !line.getElementsByTag("td").get(4).getElementsByTag("i").isEmpty();
                     address2 = line.getElementsByTag("td").get(4).text();
                 } else {
+                    smartContract = !line.getElementsByTag("td").get(6).getElementsByTag("i").isEmpty();
                     address2 = line.getElementsByTag("td").get(6).text();
                 }
                 String value = line.getElementsByTag("td").get(7).text();
@@ -84,6 +87,7 @@ class Parser {
                 stringBuilder.append(time).append(",")
                         .append(direction).append(",")
                         .append(address2).append(",")
+                        .append(smartContract).append(",")
                         .append(value).append(",")
                         .append(price).append("\n");
             }
