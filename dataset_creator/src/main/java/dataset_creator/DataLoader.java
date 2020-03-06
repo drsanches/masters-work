@@ -11,7 +11,8 @@ import java.util.List;
 public class DataLoader {
 
     private static final String DATA_FOLDER = "../data";
-    private static Parser parser = new Parser();
+    private static PageLoader pageLoader = new PageLoader();
+    private static Parser parser = new Parser(pageLoader);
 
     private static void printGroups() {
         List<Pair<String, Integer>> groups = parser.getGroupsAndAccountsNumber();
@@ -43,9 +44,14 @@ public class DataLoader {
 //        downloadAddresses("Exchange");
 
         String group = "Exchange";
-        String[] addresses = (new String[] {
-                // Array of addresses
-        });
+        String[] addresses = (
+                "address1\n" +
+                "address2\n" +
+                "address3\n" +
+                "address4\n" +
+                "address5"
+        ).split("\n");
+
         for (int i = 0; i < addresses.length; i++) {
             System.out.println("Address #" + i);
             try {
@@ -54,5 +60,6 @@ public class DataLoader {
                 e.printStackTrace();
             }
         }
+        pageLoader.close();
     }
 }

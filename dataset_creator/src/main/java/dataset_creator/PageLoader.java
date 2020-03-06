@@ -5,12 +5,19 @@ import org.openqa.selenium.chrome.ChromeDriver;
 
 class PageLoader {
 
-    String downloadHtml(String url) {
+    private WebDriver webDriver;
+
+    public PageLoader() {
         System.setProperty("webdriver.chrome.driver", "./driver/chromedriver.exe");
-        WebDriver webDriver = new ChromeDriver();
+        webDriver = new ChromeDriver();
+    }
+
+    String downloadHtml(String url) {
         webDriver.get(url);
-        String source = webDriver.getPageSource();
+        return webDriver.getPageSource();
+    }
+
+    void close() {
         webDriver.quit();
-        return source;
     }
 }

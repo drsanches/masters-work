@@ -11,7 +11,11 @@ import java.util.List;
 
 class Parser {
 
-    private PageLoader pageLoader = new PageLoader();
+    private PageLoader pageLoader;
+
+    public Parser(PageLoader pageLoader) {
+        this.pageLoader = pageLoader;
+    }
 
     List<Pair<String, Integer>> getGroupsAndAccountsNumber() {
         List<Pair<String, Integer>> groups = new LinkedList<>();
