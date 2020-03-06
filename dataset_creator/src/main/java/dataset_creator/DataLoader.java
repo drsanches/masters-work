@@ -56,10 +56,10 @@ public class DataLoader {
             System.out.println("Address #" + i);
             try {
                 downloadTransactions(addresses[i], group);
+                pageLoader.close(); // To update a session (the resource has a limit of requests per session)
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
-        pageLoader.close();
     }
 }
