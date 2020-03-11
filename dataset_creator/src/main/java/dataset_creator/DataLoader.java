@@ -3,6 +3,7 @@ package dataset_creator;
 import javafx.util.Pair;
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Comparator;
@@ -20,9 +21,33 @@ public class DataLoader {
         groups.forEach(x -> System.out.println(x.getValue() + " " + x.getKey()));
     }
 
-    private static void downloadAddresses(String group) throws IOException {
+    /**
+     * No longer works, authorization needed
+     * */
+    private static void downloadAddressesByRequest(String group) throws IOException {
         StringBuilder stringBuilder = new StringBuilder();
-        parser.getAddresses(group).forEach(x -> stringBuilder.append(x).append("\n"));
+        parser.getAddressesByRequest(group).forEach(x -> stringBuilder.append(x).append("\n"));
+        String path = DATA_FOLDER + "/groups/" + group + ".txt";
+        File file = new File(path);
+        file.getParentFile().mkdirs();
+        file.createNewFile();
+        Files.write(Paths.get(path), stringBuilder.toString().getBytes());
+    }
+
+    private static void downloadAddressesFromHtml(String group) throws IOException {
+        StringBuilder stringBuilder = new StringBuilder();
+        int count = 0;
+        for (int i = 1;; i++) {
+            String sourcePath = DATA_FOLDER + "/html/" + group + "-" + i + ".html";
+            if (!Files.exists(Paths.get(sourcePath))) {
+                break;
+            }
+            List<String> addresses = parser.getAddressesFromHtml(new String(Files.readAllBytes(Paths.get(sourcePath)), StandardCharsets.UTF_8));
+            addresses.forEach(x -> stringBuilder.append(x).append("\n"));
+            count += addresses.size();
+        }
+        System.out.println(stringBuilder.toString());
+        System.out.println("Count: " + count);
         String path = DATA_FOLDER + "/groups/" + group + ".txt";
         File file = new File(path);
         file.getParentFile().mkdirs();
@@ -41,9 +66,14 @@ public class DataLoader {
 
     public static void main(String[] args) {
 //        printGroups();
-//        downloadAddresses("Exchange");
 
-        String group = "Exchange";
+//        try {
+//            downloadAddressesFromHtml("token-contract");
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+
+        String group = "token-contract";
         String[] addresses = (
                 "address1\n" +
                 "address2\n" +

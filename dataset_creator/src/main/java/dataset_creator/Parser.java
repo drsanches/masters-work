@@ -33,7 +33,10 @@ class Parser {
         return groups;
     }
 
-    List<String> getAddresses(String groupName) {
+    /**
+     * No longer works, authorization needed
+     * */
+    List<String> getAddressesByRequest(String groupName) {
         List<String> addresses = new ArrayList<>();
         for (int page = 1;; page++) {
             System.out.println("Page: " + page);
@@ -51,6 +54,21 @@ class Parser {
                         .getElementsByTag("a").first()
                         .text().replace(" ", ""));
             }
+        }
+        return addresses;
+    }
+
+    List<String> getAddressesFromHtml(String source) {
+        List<String> addresses = new ArrayList<>();
+        Document document = Jsoup.parse(source);
+        Elements lines = document.body()
+                .getElementsByClass("table table-hover").first()
+                .getElementsByTag("tbody").first()
+                .getElementsByTag("tr");
+        for (Element line: lines) {
+            addresses.add(line.getElementsByTag("td").first()
+                    .getElementsByTag("a").first()
+                    .text().replace(" ", ""));
         }
         return addresses;
     }
