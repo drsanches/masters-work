@@ -55,6 +55,11 @@ public class DataLoader {
         Files.write(Paths.get(path), stringBuilder.toString().getBytes());
     }
 
+    private static String[] getAddresses(String group) throws IOException {
+        String path = DATA_FOLDER + "/groups/" + group + ".txt";
+        return new String(Files.readAllBytes(Paths.get(path)), StandardCharsets.UTF_8).split("\n");
+    }
+
     private static void downloadTransactions(String address, String group) throws IOException {
         String csv = parser.getTransactionsCSV(address);
         String path = DATA_FOLDER + "/groups/" + group + "/" + address + ".csv";
@@ -64,26 +69,15 @@ public class DataLoader {
         Files.write(Paths.get(path), csv.getBytes());
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
 //        printGroups();
 
-//        try {
-//            downloadAddressesFromHtml("token-contract");
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
+//        downloadAddressesFromHtml("ico-wallets");
 
-        String group = "token-contract";
-        String[] addresses = (
-                "address1\n" +
-                "address2\n" +
-                "address3\n" +
-                "address4\n" +
-                "address5"
-        ).split("\n");
-
+        String group = "ico-wallets";
+        String[] addresses = getAddresses(group);
         for (int i = 0; i < addresses.length; i++) {
-            System.out.println("Address #" + i);
+            System.out.println("Address #" + (i + 1) + "/" + addresses.length);
             try {
                 downloadTransactions(addresses[i], group);
                 pageLoader.close(); // To update a session (the resource has a limit of requests per session)
