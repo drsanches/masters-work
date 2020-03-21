@@ -1,4 +1,4 @@
-package dataset_creator;
+package dataset_creator.data_loader;
 
 import javafx.util.Pair;
 import java.io.File;

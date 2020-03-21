@@ -1,4 +1,4 @@
-package dataset_creator;
+package dataset_creator.data_loader;
 
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
