@@ -31,14 +31,24 @@ public class FeatureExtractor {
         features.put(FeatureName.AVG_TRANS_ETH.toString(), getAvgTransEth(transactions));
         features.put(FeatureName.AVG_ETH_RECEIVED.toString(), getAvgTransEth(receivedTransactions));
         features.put(FeatureName.AVG_ETH_SENT.toString(), getAvgTransEth(sentTransactions));
+        features.put(FeatureName.DEVIATION_TRANS_ETH.toString(), getDeviationTransEth(transactions));
+        features.put(FeatureName.DEVIATION_ETH_RECEIVED.toString(), getDeviationTransEth(receivedTransactions));
+        features.put(FeatureName.DEVIATION_ETH_SENT.toString(), getDeviationTransEth(sentTransactions));
+
+        //TODO: think
+        features.put(FeatureName.PERCENT_OF_SMART_CONTRACT_TRANS.toString(), getPercentOfSmartContractTrans(transactions));
+        features.put(FeatureName.PERCENT_OF_TRANS_RECEIVED_FROM_SMART_CONTRACTS.toString(), getPercentOfSmartContractTrans(receivedTransactions));
+        features.put(FeatureName.PERCENT_OF_TRANS_SENT_TO_SMART_CONTRACTS.toString(), getPercentOfSmartContractTrans(sentTransactions));
+        features.put(FeatureName.PERCENT_OF_SMART_CONTRACT_ETH.toString(), getPercentOfSmartContractEth(transactions));
+        features.put(FeatureName.PERCENT_OF_ETH_RECEIVED_FROM_SMART_CONTRACTS.toString(), getPercentOfSmartContractEth(receivedTransactions));
+        features.put(FeatureName.PERCENT_OF_ETH_SENT_TO_SMART_CONTRACTS.toString(), getPercentOfSmartContractEth(sentTransactions));
         return features;
     }
 
     public List<String> getReceivedTransactionsList(List<String> transactions) {
         List<String> receivedTransactions = new ArrayList<>();
         for (String transaction: transactions) {
-            String direction = transaction.split(",")[1];
-            if (direction.equals("IN")) {
+            if (getDirection(transaction).equals("IN")) {
                 receivedTransactions.add(transaction);
             }
         }
@@ -48,12 +58,21 @@ public class FeatureExtractor {
     public List<String> getSentTransactionsList(List<String> transactions) {
         List<String> sentTransactions = new ArrayList<>();
         for (String transaction: transactions) {
-            String direction = transaction.split(",")[1];
-            if (direction.equals("OUT")) {
+            if (getDirection(transaction).equals("OUT")) {
                 sentTransactions.add(transaction);
             }
         }
         return sentTransactions;
+    }
+
+    public List<String> getSmartContractTransactionsList(List<String> transactions) {
+        List<String> smartContractTransactions = new ArrayList<>();
+        for (String transaction: transactions) {
+            if (isSmartContract(transaction)) {
+                smartContractTransactions.add(transaction);
+            }
+        }
+        return smartContractTransactions;
     }
 
     /**
@@ -102,6 +121,65 @@ public class FeatureExtractor {
             sum += getEth(transaction);
         }
         return sum / transactions.size();
+    }
+
+    /**
+     * @return deviation eth or null if there are less than two transactions
+     * */
+    private Double getDeviationTransEth(List<String> transactions) {
+        if (transactions.isEmpty()) {
+            return null;
+        }
+        double avgEth = getAvgTransEth(transactions);
+        double sum = 0;
+        for (String transaction: transactions) {
+            double eth = getEth(transaction);
+            sum += (eth - avgEth) * (eth - avgEth);
+        }
+        double N = transactions.size();
+        return Math.sqrt(sum / N);
+    }
+
+    /**
+     * @return percent or null if there are no transactions
+     * */
+    private Double getPercentOfSmartContractTrans(List<String> transactions) {
+        double smartContractN = getSmartContractTransactionsList(transactions).size();
+        double N = transactions.size();
+        if (N > 0) {
+            return smartContractN / N;
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * @return percent or null if there are no eth in transactions
+     * */
+    private Double getPercentOfSmartContractEth(List<String> transactions) {
+        double smartContractEth = getTotalEth(getSmartContractTransactionsList(transactions));
+        double allEth = getTotalEth(transactions);
+        if (allEth > 0) {
+            return smartContractEth / allEth;
+        } else {
+            return null;
+        }
+    }
+
+    private Double getTotalEth(List<String> transactions) {
+        double sum = 0;
+        for (String transaction: transactions) {
+            sum += getEth(transaction);
+        }
+        return sum;
+    }
+
+    private String getDirection(String transaction) {
+        return transaction.split(",")[1];
+    }
+
+    private Boolean isSmartContract(String transaction) {
+        return transaction.split(",")[3].equals("true");
     }
 
     private Date getDate(String transaction) throws ParseException {
