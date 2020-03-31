@@ -100,7 +100,7 @@ class Parser {
                     smartContract = !line.getElementsByTag("td").get(6).getElementsByTag("i").isEmpty();
                     address2 = line.getElementsByTag("td").get(6).text();
                 }
-                String value = line.getElementsByTag("td").get(7).text();
+                String value = line.getElementsByTag("td").get(7).text().replaceAll(",", "");
                 String price = line.getElementsByTag("td").get(8).text();
                 stringBuilder.append(time).append(",")
                         .append(direction).append(",")

@@ -28,6 +28,9 @@ public class FeatureExtractor {
         features.put(FeatureName.DEVIATION_TIME_BETWEEN_TRANS.toString(), getDeviationTimeBetweenTrans(transactions));
         features.put(FeatureName.DEVIATION_TIME_BETWEEN_RECEIVED_TRANS.toString(), getDeviationTimeBetweenTrans(receivedTransactions));
         features.put(FeatureName.DEVIATION_TIME_BETWEEN_SENT_TRANS.toString(), getDeviationTimeBetweenTrans(sentTransactions));
+        features.put(FeatureName.AVG_TRANS_ETH.toString(), getAvgTransEth(transactions));
+        features.put(FeatureName.AVG_ETH_RECEIVED.toString(), getAvgTransEth(receivedTransactions));
+        features.put(FeatureName.AVG_ETH_SENT.toString(), getAvgTransEth(sentTransactions));
         return features;
     }
 
@@ -61,8 +64,8 @@ public class FeatureExtractor {
             return null;
         }
         double N = transactions.size() - 1;
-        Date date2 = DATE_FORMAT.parse(transactions.get(0).split(",")[0]);
-        Date date1 = DATE_FORMAT.parse(transactions.get(transactions.size() - 1).split(",")[0]);
+        Date date2 = getDate(transactions.get(0));
+        Date date1 = getDate(transactions.get(transactions.size() - 1));
         return (date2.getTime() - date1.getTime()) / N;
     }
 
@@ -75,15 +78,38 @@ public class FeatureExtractor {
         }
         double avgTime = getAvgTimeBetweenTrans(transactions);
         double sum = 0;
-        Date date1 = DATE_FORMAT.parse(transactions.get(0).split(",")[0]);
+        Date date1 = getDate(transactions.get(0));
         Date date2;
         for (int i = 1; i < transactions.size(); i++) {
             date2 = date1;
-            date1 = DATE_FORMAT.parse(transactions.get(i).split(",")[0]);
+            date1 = getDate(transactions.get(i));
             double time = date2.getTime() - date1.getTime();
             sum += (time - avgTime) * (time - avgTime);
         }
         double N = transactions.size() - 1;
         return Math.sqrt(sum / N);
+    }
+
+    /**
+     * @return average eth or null if there are no transactions
+     * */
+    private Double getAvgTransEth(List<String> transactions) {
+        if (transactions.isEmpty()) {
+            return null;
+        }
+        double sum = 0;
+        for (String transaction: transactions) {
+            sum += getEth(transaction);
+        }
+        return sum / transactions.size();
+    }
+
+    private Date getDate(String transaction) throws ParseException {
+        return DATE_FORMAT.parse(transaction.split(",")[0]);
+    }
+
+    private Double getEth(String transaction) {
+        String eth = transaction.split(",")[4];
+        return Double.parseDouble(eth.substring(0, eth.indexOf(" ")));
     }
 }
