@@ -51,7 +51,7 @@ public class DatasetCreator {
             List<String> addresses = getAddressList(groups.get(groupIndex));
             for (String address: addresses) {
                 List<String> csvLines = Files.readAllLines(Paths.get(DATA_FOLDER + "/groups/" + groups.get(groupIndex) + "/" + address + ".csv"));
-                if (csvLines.size() < TRANS_THRESHOLD) {
+                if (csvLines.size() > TRANS_THRESHOLD) {
                     Map<String, Double> features = featureExtractor.extractFeaturesFromCSV(csvLines);
                     X.add(getX(features));
                     Y.add(getY(groupIndex, groups.size()));
