@@ -43,18 +43,17 @@ public class DatasetCreator {
         return addresses;
     }
 
-    private static List<List<List<Double>>> createDataset() throws IOException, ParseException {
-        List<String> groups = getGroupList();
+    private static List<List<List<Double>>> createDataset(String[] groups) throws IOException, ParseException {
         List<List<Double>> X = new ArrayList<>();
         List<List<Double>> Y = new ArrayList<>();
-        for (int groupIndex = 0; groupIndex < groups.size(); groupIndex++) {
-            List<String> addresses = getAddressList(groups.get(groupIndex));
+        for (int groupIndex = 0; groupIndex < groups.length; groupIndex++) {
+            List<String> addresses = getAddressList(groups[groupIndex]);
             for (String address: addresses) {
-                List<String> csvLines = Files.readAllLines(Paths.get(DATA_FOLDER + "/groups/" + groups.get(groupIndex) + "/" + address + ".csv"));
+                List<String> csvLines = Files.readAllLines(Paths.get(DATA_FOLDER + "/groups/" + groups[groupIndex] + "/" + address + ".csv"));
                 if (csvLines.size() > TRANS_THRESHOLD) {
                     Map<String, Double> features = featureExtractor.extractFeaturesFromCSV(csvLines);
                     X.add(getX(features));
-                    Y.add(getY(groupIndex, groups.size()));
+                    Y.add(getY(groupIndex, groups.length));
                 }
             }
         }
@@ -93,22 +92,13 @@ public class DatasetCreator {
     }
 
     public static void main(String[] args) throws Exception {
-//        List<String> groups = getGroupList();
-
-//        String group = "ico-wallets";
-//        List<String> addresses = getAddressList(group);
-//
-//        for (String address: addresses) {
-//            try {
-//                List<String> csvLines = Files.readAllLines(Paths.get(DATA_FOLDER + "/groups/" + group + "/" + address + ".csv"));
-//                featureExtractor.extractFeaturesFromCSV(csvLines).forEach((k, v) -> System.out.println(k + ": " + v));
-//                System.out.println();
-//            } catch (Exception e) {
-//                e.printStackTrace();
-//            }
-//        }
-
-        DataGenerator dataGenerator = new DataGenerator(createDataset());
+        String[] groups = {
+                "exchange",
+                "ico-wallets",
+                "mining",
+                "token-contract"
+        };
+        DataGenerator dataGenerator = new DataGenerator(createDataset(groups));
         System.out.println(dataGenerator.getSize());
         dataGenerator.addShift(0.05);
         dataGenerator.addShift(0.1);
