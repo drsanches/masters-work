@@ -16,6 +16,7 @@ public class DatasetCreator {
     static private final String DATA_FOLDER = "../data";
     static private final String DATASET_FOLDER = "../dataset";
     static private FeatureExtractor featureExtractor = new FeatureExtractor();
+    static private int TRANS_THRESHOLD = 100;
 
     private static List<String> getGroupList() throws IOException {
         List<String> groups = new ArrayList<>();
@@ -50,9 +51,11 @@ public class DatasetCreator {
             List<String> addresses = getAddressList(groups.get(groupIndex));
             for (String address: addresses) {
                 List<String> csvLines = Files.readAllLines(Paths.get(DATA_FOLDER + "/groups/" + groups.get(groupIndex) + "/" + address + ".csv"));
-                Map<String, Double> features = featureExtractor.extractFeaturesFromCSV(csvLines);
-                X.add(getX(features));
-                Y.add(getY(groupIndex, groups.size()));
+                if (csvLines.size() < TRANS_THRESHOLD) {
+                    Map<String, Double> features = featureExtractor.extractFeaturesFromCSV(csvLines);
+                    X.add(getX(features));
+                    Y.add(getY(groupIndex, groups.size()));
+                }
             }
         }
         List<List<List<Double>>> dataset = new ArrayList<>();
@@ -87,7 +90,7 @@ public class DatasetCreator {
         file.getParentFile().mkdirs();
         file.createNewFile();
         Files.write(Paths.get(path), dataset.toString().getBytes());
-    };
+    }
 
     public static void main(String[] args) throws Exception {
 //        List<String> groups = getGroupList();
