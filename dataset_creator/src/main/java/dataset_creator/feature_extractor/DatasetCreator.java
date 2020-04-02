@@ -84,8 +84,8 @@ public class DatasetCreator {
         return Y;
     }
 
-    private static void saveDataset(List<List<List<Double>>> dataset) throws IOException {
-        String path = DATASET_FOLDER + "/dataset.txt";
+    private static void saveDataset(List<List<List<Double>>> dataset, String filename) throws IOException {
+        String path = DATASET_FOLDER + "/" + filename;
         File file = new File(path);
         file.getParentFile().mkdirs();
         file.createNewFile();
@@ -108,7 +108,17 @@ public class DatasetCreator {
 //            }
 //        }
 
-        List<List<List<Double>>> dataset = createDataset();
-        saveDataset(dataset);
+        DataGenerator dataGenerator = new DataGenerator(createDataset());
+        System.out.println(dataGenerator.getSize());
+        dataGenerator.addShift(0.05);
+        dataGenerator.addShift(0.1);
+        dataGenerator.addShift(0.15);
+        dataGenerator.addShift(0.2);
+        dataGenerator.addShift(-0.05);
+        dataGenerator.addShift(-0.1);
+        dataGenerator.addShift(-0.15);
+        dataGenerator.addShift(-0.2);
+        System.out.println(dataGenerator.getSize());
+        saveDataset(dataGenerator.getDataset(), "dataset_threshold_100_shift_05_2.txt");
     }
 }
