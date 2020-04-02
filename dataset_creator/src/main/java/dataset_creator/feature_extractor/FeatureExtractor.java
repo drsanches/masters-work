@@ -76,11 +76,11 @@ public class FeatureExtractor {
     }
 
     /**
-     * @return average time or null if there are less than two transactions
+     * @return average time or 0 if there are less than two transactions
      * */
     private Double getAvgTimeBetweenTrans(List<String> transactions) throws ParseException {
         if (transactions.size() < 2) {
-            return null;
+            return 0.0;
         }
         double N = transactions.size() - 1;
         Date date2 = getDate(transactions.get(0));
@@ -89,11 +89,11 @@ public class FeatureExtractor {
     }
 
     /**
-     * @return deviation time or null if there are less than two transactions
+     * @return deviation time or 0 if there are less than two transactions
      * */
     private Double getDeviationTimeBetweenTrans(List<String> transactions) throws ParseException {
         if (transactions.size() < 2) {
-            return null;
+            return 0.0;
         }
         double avgTime = getAvgTimeBetweenTrans(transactions);
         double sum = 0;
@@ -110,11 +110,11 @@ public class FeatureExtractor {
     }
 
     /**
-     * @return average eth or null if there are no transactions
+     * @return average eth or 0 if there are no transactions
      * */
     private Double getAvgTransEth(List<String> transactions) {
         if (transactions.isEmpty()) {
-            return null;
+            return 0.0;
         }
         double sum = 0;
         for (String transaction: transactions) {
@@ -124,11 +124,11 @@ public class FeatureExtractor {
     }
 
     /**
-     * @return deviation eth or null if there are less than two transactions
+     * @return deviation eth or 0 if there are less than two transactions
      * */
     private Double getDeviationTransEth(List<String> transactions) {
         if (transactions.isEmpty()) {
-            return null;
+            return 0.0;
         }
         double avgEth = getAvgTransEth(transactions);
         double sum = 0;
@@ -141,7 +141,7 @@ public class FeatureExtractor {
     }
 
     /**
-     * @return percent or null if there are no transactions
+     * @return percent or 0 if there are no transactions
      * */
     private Double getPercentOfSmartContractTrans(List<String> transactions) {
         double smartContractN = getSmartContractTransactionsList(transactions).size();
@@ -149,12 +149,12 @@ public class FeatureExtractor {
         if (N > 0) {
             return smartContractN / N;
         } else {
-            return null;
+            return 0.0;
         }
     }
 
     /**
-     * @return percent or null if there are no eth in transactions
+     * @return percent or 0 if there are no eth in transactions
      * */
     private Double getPercentOfSmartContractEth(List<String> transactions) {
         double smartContractEth = getTotalEth(getSmartContractTransactionsList(transactions));
@@ -162,7 +162,7 @@ public class FeatureExtractor {
         if (allEth > 0) {
             return smartContractEth / allEth;
         } else {
-            return null;
+            return 0.0;
         }
     }
 
