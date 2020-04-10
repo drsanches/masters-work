@@ -5,6 +5,7 @@ from sklearn.model_selection import train_test_split
 import numpy as np
 import json
 
+
 DATASET_PATH = '../dataset/dataset_threshold_100_shift_05_2.txt'
 
 dataset = []
@@ -19,7 +20,6 @@ output_shape = Y.shape[1]
 
 print(X_train.shape)
 print(X_test.shape)
-
 
 model = Sequential()
 model.add(Dense(128, activation='sigmoid', input_dim=input_shape))
