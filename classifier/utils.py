@@ -2,16 +2,27 @@ import numpy as np
 import json
 
 
-__DATASET_PATH = '../dataset/dataset_threshold_100_shift_05_2.txt'
+__DATASET_PATH = '../dataset/'
 
-def get_dataset():
+def get_dataset(filename):
     dataset = []
-    with open(__DATASET_PATH) as f:
+    with open(__DATASET_PATH + filename) as f:
         dataset = json.load(f)
 
     X = np.array(dataset[0])
     Y = np.array(dataset[1])
     return X, Y
+
+
+def convert_Y_to_class_numbers(Y):
+    tmp = []
+    for y in Y:
+        tmp.append(convert_y_to_class_number(y))
+    return tmp
+
+
+def convert_y_to_class_number(y):
+    return np.argmax(y);
 
 
 def get_feature_names():

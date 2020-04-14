@@ -1,9 +1,5 @@
 import matplotlib.pyplot as plt
-import numpy as np
-import json
-
-
-DATASET_PATH = '../dataset/dataset_threshold_100.txt'
+import utils
 
 
 def visualize(X, x_index, y_index, Y):
@@ -42,18 +38,8 @@ def visualize(X, x_index, y_index, Y):
     ax.legend()
     plt.show()
 
-
-dataset = []
-with open(DATASET_PATH) as f:
-    dataset = json.load(f)
-
-X = np.array(dataset[0])
-Y = np.array(dataset[1])
-
-tmp = []
-for y in Y:
-    tmp.append(np.argmax(y))
-Y = tmp
+X, Y = utils.get_dataset('dataset_threshold_100.txt')
+Y = utils.convert_Y_to_class_numbers(Y)
 
 print(X.shape)
 

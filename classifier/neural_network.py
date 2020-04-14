@@ -5,7 +5,8 @@ from sklearn.model_selection import train_test_split
 import numpy as np
 import utils
 
-X, Y = utils.get_dataset()
+
+X, Y = utils.get_dataset('dataset_threshold_100_shift_05_2.txt')
 X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.2, random_state=42)
 input_shape = X.shape[1]
 output_shape = Y.shape[1]
@@ -33,7 +34,7 @@ history = model.fit(X_train, Y_train,
 scores = model.evaluate(X_test, Y_test, verbose=1)
 print("Accuracy on test data: %.2f%%" % (scores[1]*100))
 
-# Best: 74.82%
+# Best: 75.54%
 # Only 6 first fetures: 74.41%
 
 # Without contracts: 73.59%
