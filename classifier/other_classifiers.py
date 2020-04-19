@@ -3,7 +3,7 @@ from sklearn.metrics import classification_report
 from sklearn.metrics import accuracy_score
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.svm import SVC
-from sklearn.naive_bayes import GaussianNB
+from sklearn.naive_bayes import GaussianNB, BernoulliNB
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.ensemble import RandomForestClassifier
 import numpy as np
@@ -88,56 +88,56 @@ def test_fetures(X, Y):
         # print(classification_report(Y_test, forest_pred))
         print("%.2f%%" % (accuracy_score(Y_test, forest_pred)*100), end=' ')
 
-def  k_nearest_neighbors(X_train, Y_train, X_test, Y_test):
-    model = KNeighborsClassifier(n_neighbors=5)
-    model.fit(X_train, Y_train)
-    pred = model.predict(X_test)
-    return accuracy_score(Y_test, pred)
-
-def support_vector_machine(X_train, Y_train, X_test, Y_test):
-    model = SVC()
-    model.fit(X_train, Y_train)
-    pred = model.predict(X_test)
-    return accuracy_score(Y_test, pred)
-
-def naive_bayes_classifier(X_train, Y_train, X_test, Y_test):
-    model = GaussianNB()
-    model.fit(X_train, Y_train)
-    pred = model.predict(X_test)
-    return accuracy_score(Y_test, pred)
-
-def decision_tree(X_train, Y_train, X_test, Y_test):
-    model = DecisionTreeClassifier()
-    model.fit(X_train, Y_train)
-    pred = model.predict(X_test)
-    return accuracy_score(Y_test, pred)
-
-def random_forest(X_train, Y_train, X_test, Y_test):
-    model = RandomForestClassifier()
-    model.fit(X_train, Y_train)
-    pred = model.predict(X_test)
-    return accuracy_score(Y_test, pred)
-
-def plot_accuracy(X, Y, method):
+def plot_accuracy(X, Y, model):
     feature_num = X.shape[1]
     X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.2, random_state=42)
     fig, ax = plt.subplots()
-    ax.set_title(method.__name__)
-    ax.hlines(method(X_train, Y_train, X_test, Y_test) * 100, 0, feature_num - 1)
+    ax.set_title(model)
+    model.fit(X_train, Y_train)
+    pred = model.predict(X_test)
+    ax.hlines(accuracy_score(Y_test, pred) * 100, 0, feature_num - 1)
     acc = []
     for i in range(feature_num):
         tmp = utils.remove_feature(X, i)
         X_train, X_test, Y_train, Y_test = train_test_split(tmp, Y, test_size=0.2, random_state=42)
-        acc.append(method(X_train, Y_train, X_test, Y_test) * 100)
-    ax.plot(range(feature_num), acc)
-    points = [i + 0.5 for i in range(feature_num)]
+        model.fit(X_train, Y_train)
+        pred = model.predict(X_test)
+        acc.append(accuracy_score(Y_test, pred) * 100)
+    points = [i for i in range(feature_num)]
     xticks = [i + 1 for i in range(feature_num)]
     plt.xticks(points, xticks)
+    ax.plot(range(feature_num), acc)
+    plt.show()
+
+def plot_feature_importances(X, Y, model):
+    feature_num = X.shape[1]
+    X_train, X_test, Y_train, _ = train_test_split(X, Y, test_size=0.2, random_state=42)
+    model = DecisionTreeClassifier()
+    model.fit(X_train, Y_train)
+    pred = model.predict(X_test)
+    fig, ax = plt.subplots()
+    ax.set_title(model)
+    points = [i for i in range(feature_num)]
+    xticks = [i + 1 for i in range(feature_num)]
+    plt.xticks(points, xticks)
+    ax.bar(range(feature_num), model.feature_importances_)
     plt.show()
 
 
 X, Y = utils.get_dataset('dataset_threshold_100.txt')
 Y = utils.convert_Y_to_class_numbers(Y)
+
+plot_accuracy(X, Y, KNeighborsClassifier(n_neighbors=5))
+plot_accuracy(X, Y, SVC())
+plot_accuracy(X, Y, GaussianNB())
+plot_accuracy(X, Y, DecisionTreeClassifier())
+plot_accuracy(X, Y, RandomForestClassifier())
+
+plot_feature_importances(X, Y, DecisionTreeClassifier())
+plot_feature_importances(X, Y, RandomForestClassifier())
+
+
+# # # # #
 
 # print(X.shape[1])
 # X = utils.remove_feature(X, 17)
@@ -160,8 +160,9 @@ Y = utils.convert_Y_to_class_numbers(Y)
 # # X = utils.remove_feature(X, 0)
 # print(X.shape[1])
 
-plot_accuracy(X, Y, k_nearest_neighbors)
-plot_accuracy(X, Y, support_vector_machine)
-plot_accuracy(X, Y, naive_bayes_classifier)
-plot_accuracy(X, Y, decision_tree)
-plot_accuracy(X, Y, random_forest)
+# X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.2, random_state=42)
+# model = BernoulliNB(alpha=1000.0)
+# model.fit(X_train, Y_train)
+# pred = model.predict(X_test)
+# print(model.feature_importances_)
+# print(accuracy_score(Y_test, pred))
