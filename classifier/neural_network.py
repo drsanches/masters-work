@@ -1,5 +1,5 @@
 from keras.models import Sequential
-from keras.layers import Dense, Dropout, Activation
+from keras.layers import Dense, Dropout, Activation, BatchNormalization
 from keras.callbacks import TensorBoard
 from sklearn.model_selection import train_test_split
 import numpy as np
@@ -16,8 +16,11 @@ print(X_test.shape)
 
 model = Sequential()
 model.add(Dense(128, activation='sigmoid', input_dim=input_shape))
+model.add(BatchNormalization())
 model.add(Dense(256, activation='sigmoid'))
+model.add(BatchNormalization())
 model.add(Dense(512, activation='sigmoid'))
+model.add(BatchNormalization())
 model.add(Dense(output_shape, activation='softmax'))
 
 model.compile(loss="categorical_crossentropy", optimizer="adam", metrics=["accuracy"])
@@ -36,5 +39,6 @@ print("Accuracy on test data: %.2f%%" % (scores[1]*100))
 
 # Best: 75.54%
 # Only 6 first fetures: 74.41%
+# Tanh: 72.55%
 
 # Without contracts: 73.59%

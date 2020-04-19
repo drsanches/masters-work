@@ -6,6 +6,7 @@ import utils
 
 
 X, _ = utils.get_dataset('dataset_threshold_100.txt')
+# X, _ = utils.get_dataset('dataset_threshold_100_shift_05_2.txt')
 features = utils.get_feature_names()
 d = pd.DataFrame(data=X, columns=features)
 
