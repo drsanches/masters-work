@@ -90,7 +90,9 @@ def test_fetures(X, Y):
 
 def plot_accuracy(X, Y, model):
     feature_num = X.shape[1]
-    X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.2, random_state=42)
+    # X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.2, random_state=42)
+    X_train, Y_train = utils.get_dataset('train_threshold_100.txt')
+    X_test, Y_test = utils.get_dataset('test_threshold_100.txt')
     fig, ax = plt.subplots()
     ax.set_title(model)
     model.fit(X_train, Y_train)
@@ -125,16 +127,19 @@ def plot_feature_importances(X, Y, model):
 
 
 X, Y = utils.get_dataset('dataset_threshold_100.txt')
+# X, Y = utils.get_dataset('dataset_threshold_100_shift_05_2.txt')
 Y = utils.convert_Y_to_class_numbers(Y)
 
-plot_accuracy(X, Y, KNeighborsClassifier(n_neighbors=5))
-plot_accuracy(X, Y, SVC())
-plot_accuracy(X, Y, GaussianNB())
-plot_accuracy(X, Y, DecisionTreeClassifier())
+# test_fetures(X, Y)
+
+# plot_accuracy(X, Y, KNeighborsClassifier(n_neighbors=5))
+# plot_accuracy(X, Y, SVC())
+# plot_accuracy(X, Y, GaussianNB())
+# plot_accuracy(X, Y, DecisionTreeClassifier())
 plot_accuracy(X, Y, RandomForestClassifier())
 
-plot_feature_importances(X, Y, DecisionTreeClassifier())
-plot_feature_importances(X, Y, RandomForestClassifier())
+# plot_feature_importances(X, Y, DecisionTreeClassifier())
+# plot_feature_importances(X, Y, RandomForestClassifier())
 
 
 # # # # #

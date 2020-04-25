@@ -43,24 +43,47 @@ public class DatasetCreator {
         return addresses;
     }
 
-    private static List<List<List<Double>>> createDataset(String[] groups) throws IOException, ParseException {
-        List<List<Double>> X = new ArrayList<>();
-        List<List<Double>> Y = new ArrayList<>();
+    private static List<List<List<List<Double>>>> createDataset(String[] groups) throws IOException, ParseException {
+        List<List<Double>> trainX = new ArrayList<>();
+        List<List<Double>> trainY = new ArrayList<>();
+        List<List<Double>> testX = new ArrayList<>();
+        List<List<Double>> testY = new ArrayList<>();
         for (int groupIndex = 0; groupIndex < groups.length; groupIndex++) {
+            List<List<Double>> groupX = new ArrayList<>();
+            List<List<Double>> groupY = new ArrayList<>();
             List<String> addresses = getAddressList(groups[groupIndex]);
             for (String address: addresses) {
                 List<String> csvLines = Files.readAllLines(Paths.get(DATA_FOLDER + "/groups/" + groups[groupIndex] + "/" + address + ".csv"));
                 if (csvLines.size() > TRANS_THRESHOLD) {
                     Map<String, Double> features = featureExtractor.extractFeaturesFromCSV(csvLines);
-                    X.add(getX(features));
-                    Y.add(getY(groupIndex, groups.length));
+                    groupX.add(getX(features));
+                    groupY.add(getY(groupIndex, groups.length));
                 }
             }
+            addData(groupX, trainX, testX, 0.3);
+            addData(groupY, trainY, testY, 0.3);
         }
-        List<List<List<Double>>> dataset = new ArrayList<>();
-        dataset.add(X);
-        dataset.add(Y);
+        List<List<List<Double>>> trainDataset = new ArrayList<>();
+        trainDataset.add(trainX);
+        trainDataset.add(trainY);
+        List<List<List<Double>>> testDataset = new ArrayList<>();
+        testDataset.add(testX);
+        testDataset.add(testY);
+        List<List<List<List<Double>>>> dataset = new ArrayList<>();
+        dataset.add(trainDataset);
+        dataset.add(testDataset);
         return dataset;
+    }
+
+    private static void addData(List<List<Double>> groupX, List<List<Double>> trainX, List<List<Double>> testX, double testPart) {
+        int N = new Double(groupX.size() * testPart).intValue();
+        for (int i = 0; i < groupX.size(); i++) {
+            if (i <= N) {
+                testX.add(groupX.get(i));
+            } else {
+                trainX.add(groupX.get(i));
+            }
+        }
     }
 
     private static List<Double> getX(Map<String, Double> features) {
@@ -98,17 +121,24 @@ public class DatasetCreator {
                 "mining",
                 "token-contract"
         };
-        DataGenerator dataGenerator = new DataGenerator(createDataset(groups));
-        System.out.println(dataGenerator.getSize());
-        dataGenerator.addShift(0.05);
-        dataGenerator.addShift(0.1);
-        dataGenerator.addShift(0.15);
-        dataGenerator.addShift(0.2);
-        dataGenerator.addShift(-0.05);
-        dataGenerator.addShift(-0.1);
-        dataGenerator.addShift(-0.15);
-        dataGenerator.addShift(-0.2);
-        System.out.println(dataGenerator.getSize());
-        saveDataset(dataGenerator.getDataset(), "dataset_threshold_100_shift_05_2.txt");
+        List<List<List<List<Double>>>> dataset = createDataset(groups);
+        List<List<List<Double>>> trainDataset = dataset.get(0);
+        List<List<List<Double>>> testDataset = dataset.get(1);
+        DataGenerator trainDataGenerator = new DataGenerator(trainDataset);
+        System.out.println("Train: " + trainDataGenerator.getSize());
+        System.out.println("Test: " + testDataset.get(0).size());
+        trainDataGenerator.addShift(0.05);
+        trainDataGenerator.addShift(0.1);
+        trainDataGenerator.addShift(0.15);
+        trainDataGenerator.addShift(0.2);
+        trainDataGenerator.addShift(-0.05);
+        trainDataGenerator.addShift(-0.1);
+        trainDataGenerator.addShift(-0.15);
+        trainDataGenerator.addShift(-0.2);
+        System.out.println();
+        System.out.println("Train: " + trainDataGenerator.getSize());
+        System.out.println("Test: " + testDataset.get(0).size());
+        saveDataset(trainDataGenerator.getDataset(), "train_threshold_100_shift_05_2.txt");
+        saveDataset(testDataset, "test_threshold_100.txt");
     }
 }

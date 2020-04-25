@@ -22,34 +22,39 @@ def convert_Y_to_class_numbers(Y):
 
 
 def convert_y_to_class_number(y):
-    return np.argmax(y);
+    return np.argmax(y)
 
 
 def get_feature_names():
     return [
-    'AVG_TIME_BETWEEN_TRANS',
-    'AVG_TIME_BETWEEN_SENT_TRANS',
-    'AVG_TIME_BETWEEN_RECEIVED_TRANS',
-    'DEVIATION_TIME_BETWEEN_TRANS',
-    'DEVIATION_TIME_BETWEEN_SENT_TRANS',
-    'DEVIATION_TIME_BETWEEN_RECEIVED_TRANS',
-    'AVG_TRANS_ETH',
-    'AVG_ETH_SENT',
-    'AVG_ETH_RECEIVED',
-    'DEVIATION_TRANS_ETH',
-    'DEVIATION_ETH_SENT',
-    'DEVIATION_ETH_RECEIVED',
-    'PERCENT_OF_SMART_CONTRACT_TRANS',
-    'PERCENT_OF_TRANS_RECEIVED_FROM_SMART_CONTRACTS',
-    'PERCENT_OF_TRANS_SENT_TO_SMART_CONTRACTS',
-    'PERCENT_OF_SMART_CONTRACT_ETH',
-    'PERCENT_OF_ETH_RECEIVED_FROM_SMART_CONTRACTS',
-    'PERCENT_OF_ETH_SENT_TO_SMART_CONTRACTS'
+        # transactions 
+        'AVG_TIME_BETWEEN_TRANS',
+        'AVG_TIME_BETWEEN_SENT_TRANS',
+        'AVG_TIME_BETWEEN_RECEIVED_TRANS',
+        'DEVIATION_TIME_BETWEEN_TRANS',
+        'DEVIATION_TIME_BETWEEN_SENT_TRANS',
+        'DEVIATION_TIME_BETWEEN_RECEIVED_TRANS',
+
+        # eth
+        'AVG_TRANS_ETH',
+        'AVG_ETH_SENT',
+        'AVG_ETH_RECEIVED',
+        'DEVIATION_TRANS_ETH',
+        'DEVIATION_ETH_SENT',
+        'DEVIATION_ETH_RECEIVED',
+
+        # Smart contracts
+        'PERCENT_OF_SMART_CONTRACT_TRANS',
+        'PERCENT_OF_TRANS_RECEIVED_FROM_SMART_CONTRACTS',
+        'PERCENT_OF_TRANS_SENT_TO_SMART_CONTRACTS',
+        'PERCENT_OF_SMART_CONTRACT_ETH',
+        'PERCENT_OF_ETH_RECEIVED_FROM_SMART_CONTRACTS',
+        'PERCENT_OF_ETH_SENT_TO_SMART_CONTRACTS'
     ]
 
 
 def remove_feature(X, featureIndex):
-    res = [];
+    res = []
     for x in X:
         tmp = x
         tmp = np.delete(tmp, featureIndex)
