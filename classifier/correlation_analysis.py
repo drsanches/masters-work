@@ -27,4 +27,5 @@ xticks = [i + 1 for i in range(len(features))]
 yticks = [features[i] + '    ' + str(i + 1) for i in range(len(features))]
 plt.xticks(points, xticks, rotation=0)
 plt.yticks(points, yticks)
+plt.title('Correlation matrix')
 plt.show()

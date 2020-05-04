@@ -3,9 +3,10 @@ from sklearn.metrics import classification_report
 from sklearn.metrics import accuracy_score
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.svm import SVC
-from sklearn.naive_bayes import GaussianNB, BernoulliNB
+from sklearn.naive_bayes import GaussianNB, BernoulliNB, MultinomialNB
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import confusion_matrix 
 import numpy as np
 import matplotlib.pyplot as plt
 import utils
@@ -88,37 +89,43 @@ def test_fetures(X, Y):
         # print(classification_report(Y_test, forest_pred))
         print("%.2f%%" % (accuracy_score(Y_test, forest_pred)*100), end=' ')
 
-def plot_accuracy(X, Y, model):
-    feature_num = X.shape[1]
-    # X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.2, random_state=42)
-    X_train, Y_train = utils.get_dataset('train_threshold_100.txt')
-    X_test, Y_test = utils.get_dataset('test_threshold_100.txt')
+
+def plot_accuracy(X_train, Y_train, X_test, Y_test, model):
+    feature_num = X_train.shape[1]
     fig, ax = plt.subplots()
     ax.set_title(model)
     model.fit(X_train, Y_train)
     pred = model.predict(X_test)
-    ax.hlines(accuracy_score(Y_test, pred) * 100, 0, feature_num - 1)
+    acc_for_all = accuracy_score(Y_test, pred)
+    print(classification_report(Y_test, pred))
+    print(confusion_matrix(Y_test, pred))
+    ax.hlines(acc_for_all * 100, 0, feature_num - 1, label=str(acc_for_all))
     acc = []
     for i in range(feature_num):
-        tmp = utils.remove_feature(X, i)
-        X_train, X_test, Y_train, Y_test = train_test_split(tmp, Y, test_size=0.2, random_state=42)
-        model.fit(X_train, Y_train)
-        pred = model.predict(X_test)
+        tmp_X_train = utils.remove_feature(X_train, i)
+        tmp_X_test = utils.remove_feature(X_test, i)
+        model.fit(tmp_X_train, Y_train)
+        pred = model.predict(tmp_X_test)
         acc.append(accuracy_score(Y_test, pred) * 100)
     points = [i for i in range(feature_num)]
     xticks = [i + 1 for i in range(feature_num)]
     plt.xticks(points, xticks)
     ax.plot(range(feature_num), acc)
+    ax.set_xlabel('feature number')
+    ax.set_ylabel('accuracy')
+    plt.legend(loc='lower right')
     plt.show()
 
-def plot_feature_importances(X, Y, model):
+
+def plot_feature_importances(X_train, Y_train, X_test, Y_test, model):
     feature_num = X.shape[1]
-    X_train, X_test, Y_train, _ = train_test_split(X, Y, test_size=0.2, random_state=42)
     model = DecisionTreeClassifier()
     model.fit(X_train, Y_train)
     pred = model.predict(X_test)
+    print(classification_report(Y_test, pred))
+    print(confusion_matrix(Y_test, pred))
     fig, ax = plt.subplots()
-    ax.set_title(model)
+    ax.set_title('Accuracy: ' + str(accuracy_score(Y_test, pred)))
     points = [i for i in range(feature_num)]
     xticks = [i + 1 for i in range(feature_num)]
     plt.xticks(points, xticks)
@@ -126,48 +133,70 @@ def plot_feature_importances(X, Y, model):
     plt.show()
 
 
+def prepare_dataset(X_train, X_test):
+    tmp_X_train = X_train
+    tmp_X_test = X_test
+    tmp_X_train = utils.remove_feature(tmp_X_train, 17)
+    tmp_X_train = utils.remove_feature(tmp_X_train, 16)
+    tmp_X_train = utils.remove_feature(tmp_X_train, 15)
+    tmp_X_train = utils.remove_feature(tmp_X_train, 14)
+    tmp_X_train = utils.remove_feature(tmp_X_train, 13)
+    tmp_X_train = utils.remove_feature(tmp_X_train, 12)
+    tmp_X_train = utils.remove_feature(tmp_X_train, 11)
+    tmp_X_train = utils.remove_feature(tmp_X_train, 10)
+    tmp_X_train = utils.remove_feature(tmp_X_train, 9)
+    tmp_X_train = utils.remove_feature(tmp_X_train, 8)
+    tmp_X_train = utils.remove_feature(tmp_X_train, 7)
+    tmp_X_train = utils.remove_feature(tmp_X_train, 6)
+    # tmp_X_train = utils.remove_feature(tmp_X_train, 5)
+    # tmp_X_train = utils.remove_feature(tmp_X_train, 4)
+    # tmp_X_train = utils.remove_feature(tmp_X_train, 3)
+    # tmp_X_train = utils.remove_feature(tmp_X_train, 2)
+    # tmp_X_train = utils.remove_feature(tmp_X_train, 1)
+    # tmp_X_train = utils.remove_feature(tmp_X_train, 0)
+    tmp_X_test = utils.remove_feature(tmp_X_test, 17)
+    tmp_X_test = utils.remove_feature(tmp_X_test, 16)
+    tmp_X_test = utils.remove_feature(tmp_X_test, 15)
+    tmp_X_test = utils.remove_feature(tmp_X_test, 14)
+    tmp_X_test = utils.remove_feature(tmp_X_test, 13)
+    tmp_X_test = utils.remove_feature(tmp_X_test, 12)
+    tmp_X_test = utils.remove_feature(tmp_X_test, 11)
+    tmp_X_test = utils.remove_feature(tmp_X_test, 10)
+    tmp_X_test = utils.remove_feature(tmp_X_test, 9)
+    tmp_X_test = utils.remove_feature(tmp_X_test, 8)
+    tmp_X_test = utils.remove_feature(tmp_X_test, 7)
+    tmp_X_test = utils.remove_feature(tmp_X_test, 6)
+    # tmp_X_test = utils.remove_feature(tmp_X_test, 5)
+    # tmp_X_test = utils.remove_feature(tmp_X_test, 4)
+    # tmp_X_test = utils.remove_feature(tmp_X_test, 3)
+    # tmp_X_test = utils.remove_feature(tmp_X_test, 2)
+    # tmp_X_test = utils.remove_feature(tmp_X_test, 1)
+    # tmp_X_test = utils.remove_feature(tmp_X_test, 0)
+    return tmp_X_train, tmp_X_test
+
+
 X, Y = utils.get_dataset('dataset_threshold_100.txt')
-# X, Y = utils.get_dataset('dataset_threshold_100_shift_05_2.txt')
-Y = utils.convert_Y_to_class_numbers(Y)
+# X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.2)
+X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.2, random_state=50)
+# X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.2, random_state=40)
+# X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.2, random_state=30)
+# X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.2, random_state=20)
+# X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.2, random_state=10)
+# X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.2, random_state=0)
 
-# test_fetures(X, Y)
+# X_train, Y_train = utils.get_dataset('train_threshold_100.txt')
+# X_test, Y_test = utils.get_dataset('test_threshold_100.txt')
 
-# plot_accuracy(X, Y, KNeighborsClassifier(n_neighbors=5))
-# plot_accuracy(X, Y, SVC())
-# plot_accuracy(X, Y, GaussianNB())
-# plot_accuracy(X, Y, DecisionTreeClassifier())
-plot_accuracy(X, Y, RandomForestClassifier())
+Y_train = utils.convert_Y_to_class_numbers(Y_train)
+Y_test = utils.convert_Y_to_class_numbers(Y_test)
 
-# plot_feature_importances(X, Y, DecisionTreeClassifier())
-# plot_feature_importances(X, Y, RandomForestClassifier())
+# X_train, X_test = prepare_dataset(X_train, X_test)
 
+# plot_accuracy(X_train, Y_train, X_test, Y_test, KNeighborsClassifier(n_neighbors=5))
+# plot_accuracy(X_train, Y_train, X_test, Y_test, SVC())
+# plot_accuracy(X_train, Y_train, X_test, Y_test, GaussianNB())
+# plot_accuracy(X_train, Y_train, X_test, Y_test, DecisionTreeClassifier())
+# plot_accuracy(X_train, Y_train, X_test, Y_test, RandomForestClassifier())
 
-# # # # #
-
-# print(X.shape[1])
-# X = utils.remove_feature(X, 17)
-# X = utils.remove_feature(X, 16)
-# X = utils.remove_feature(X, 15)
-# X = utils.remove_feature(X, 14)
-# X = utils.remove_feature(X, 13)
-# X = utils.remove_feature(X, 12)
-# X = utils.remove_feature(X, 11)
-# X = utils.remove_feature(X, 10)
-# X = utils.remove_feature(X, 9)
-# X = utils.remove_feature(X, 8)
-# X = utils.remove_feature(X, 7)
-# X = utils.remove_feature(X, 6)
-# # X = utils.remove_feature(X, 5)
-# # X = utils.remove_feature(X, 4) # 0.02
-# # X = utils.remove_feature(X, 3)
-# # X = utils.remove_feature(X, 2)
-# # X = utils.remove_feature(X, 1) # 0.02
-# # X = utils.remove_feature(X, 0)
-# print(X.shape[1])
-
-# X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.2, random_state=42)
-# model = BernoulliNB(alpha=1000.0)
-# model.fit(X_train, Y_train)
-# pred = model.predict(X_test)
-# print(model.feature_importances_)
-# print(accuracy_score(Y_test, pred))
+# plot_feature_importances(X_train, Y_train, X_test, Y_test, DecisionTreeClassifier())
+plot_feature_importances(X_train, Y_train, X_test, Y_test, RandomForestClassifier(n_estimators=500))
