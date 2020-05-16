@@ -6,10 +6,18 @@ from sklearn.svm import SVC
 from sklearn.naive_bayes import GaussianNB, BernoulliNB, MultinomialNB
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.ensemble import RandomForestClassifier
+from sklearn.ensemble import GradientBoostingClassifier
+from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import confusion_matrix 
+from sklearn import preprocessing
 import numpy as np
 import matplotlib.pyplot as plt
 import utils
+
+
+plt.rcParams.update({'font.size': 16})
+plt.rc('xtick', labelsize=12)
+plt.rc('ytick', labelsize=12)
 
 
 def test_fetures(X, Y):
@@ -90,16 +98,28 @@ def test_fetures(X, Y):
         print("%.2f%%" % (accuracy_score(Y_test, forest_pred)*100), end=' ')
 
 
-def plot_accuracy(X_train, Y_train, X_test, Y_test, model):
+def test_model(X, Y, model):
+    states = [50, 40, 30, 20, 10, 0]
+    for state in states:
+        X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.2, random_state=state)
+        model.fit(X_train, Y_train)
+        pred = model.predict(X_test)
+        print(classification_report(Y_test, pred))
+        print(confusion_matrix(Y_test, pred))
+        print("%.2f%%" % (accuracy_score(Y_test, pred)*100), end='\n')
+
+
+def plot_accuracy(X_train, Y_train, X_test, Y_test, model, title):
     feature_num = X_train.shape[1]
-    fig, ax = plt.subplots()
-    ax.set_title(model)
+    # fig, ax = plt.subplots()
+    fig, ax = plt.subplots(figsize=(7, 6))
+    ax.set_title(title)
     model.fit(X_train, Y_train)
     pred = model.predict(X_test)
     acc_for_all = accuracy_score(Y_test, pred)
     print(classification_report(Y_test, pred))
     print(confusion_matrix(Y_test, pred))
-    ax.hlines(acc_for_all * 100, 0, feature_num - 1, label=str(acc_for_all))
+    ax.hlines(acc_for_all * 100, 0, feature_num - 1, label='Full dataset accuracy = %.2f%%' % (acc_for_all * 100))
     acc = []
     for i in range(feature_num):
         tmp_X_train = utils.remove_feature(X_train, i)
@@ -111,9 +131,9 @@ def plot_accuracy(X_train, Y_train, X_test, Y_test, model):
     xticks = [i + 1 for i in range(feature_num)]
     plt.xticks(points, xticks)
     ax.plot(range(feature_num), acc)
-    ax.set_xlabel('feature number')
-    ax.set_ylabel('accuracy')
-    plt.legend(loc='lower right')
+    ax.set_xlabel('Excluded feature number')
+    ax.set_ylabel('Accuracy')
+    plt.legend(loc='upper right')
     plt.show()
 
 
@@ -124,12 +144,15 @@ def plot_feature_importances(X_train, Y_train, X_test, Y_test, model):
     pred = model.predict(X_test)
     print(classification_report(Y_test, pred))
     print(confusion_matrix(Y_test, pred))
-    fig, ax = plt.subplots()
-    ax.set_title('Accuracy: ' + str(accuracy_score(Y_test, pred)))
+    # fig, ax = plt.subplots()
+    fig, ax = plt.subplots(figsize=(7, 6))
+    ax.set_title('Accuracy: %.2f%%' % (accuracy_score(Y_test, pred) * 100))
     points = [i for i in range(feature_num)]
     xticks = [i + 1 for i in range(feature_num)]
     plt.xticks(points, xticks)
     ax.bar(range(feature_num), model.feature_importances_)
+    ax.set_xlabel('Feature number')
+    ax.set_ylabel('Importance')
     plt.show()
 
 
@@ -176,6 +199,8 @@ def prepare_dataset(X_train, X_test):
 
 
 X, Y = utils.get_dataset('dataset_threshold_100.txt')
+# X = preprocessing.normalize(X)
+Y = utils.convert_Y_to_class_numbers(Y)
 # X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.2)
 X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.2, random_state=50)
 # X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.2, random_state=40)
@@ -184,19 +209,19 @@ X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.2, random_
 # X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.2, random_state=10)
 # X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.2, random_state=0)
 
-# X_train, Y_train = utils.get_dataset('train_threshold_100.txt')
-# X_test, Y_test = utils.get_dataset('test_threshold_100.txt')
-
-Y_train = utils.convert_Y_to_class_numbers(Y_train)
-Y_test = utils.convert_Y_to_class_numbers(Y_test)
-
 # X_train, X_test = prepare_dataset(X_train, X_test)
-
-# plot_accuracy(X_train, Y_train, X_test, Y_test, KNeighborsClassifier(n_neighbors=5))
+# plot_accuracy(X_train, Y_train, X_test, Y_test, KNeighborsClassifier(n_neighbors=5), 'KNN')
 # plot_accuracy(X_train, Y_train, X_test, Y_test, SVC())
-# plot_accuracy(X_train, Y_train, X_test, Y_test, GaussianNB())
 # plot_accuracy(X_train, Y_train, X_test, Y_test, DecisionTreeClassifier())
 # plot_accuracy(X_train, Y_train, X_test, Y_test, RandomForestClassifier())
+# plot_accuracy(X_train, Y_train, X_test, Y_test, GradientBoostingClassifier())
 
 # plot_feature_importances(X_train, Y_train, X_test, Y_test, DecisionTreeClassifier())
-plot_feature_importances(X_train, Y_train, X_test, Y_test, RandomForestClassifier(n_estimators=500))
+# plot_feature_importances(X_train, Y_train, X_test, Y_test, RandomForestClassifier(n_estimators=500))
+plot_feature_importances(X_train, Y_train, X_test, Y_test, GradientBoostingClassifier())
+
+# test_model(X, Y, KNeighborsClassifier(n_neighbors=5))
+# test_model(X, Y, SVC(C=1.0, kernel='rbf'))
+# test_model(X, Y, DecisionTreeClassifier())
+# test_model(X, Y, RandomForestClassifier())
+# test_model(X, Y, GradientBoostingClassifier())

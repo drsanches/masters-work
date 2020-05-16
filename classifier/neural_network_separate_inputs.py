@@ -64,7 +64,7 @@ def create_model(input_layer):
     x = Dense(128, activation='sigmoid')(x)
     x = BatchNormalization()(x)
     x = Dropout(0.2)(x)
-    x = Dense(128, activation='sigmoid')(x)
+    x = Dense(256, activation='sigmoid')(x)
     x = BatchNormalization()(x)
     x = Dropout(0.2)(x)
     return x
